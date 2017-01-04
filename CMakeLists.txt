@@ -19,17 +19,10 @@ project ( external_libjpeg-turbo CXX C )
 set ( ${PROJECT_NAME}_STATICLIB_VERSION 1.5.13-1 )
 set ( ${PROJECT_NAME}_DESCRIPTION "libjpeg-turbo library build for Staticlibs" )
 set ( ${PROJECT_NAME}_URL https://github.com/staticlibs/external_libjpeg-turbo )
-include ( ${CMAKE_CURRENT_LIST_DIR}/resources/macros.cmake )
 
 # standalone build
 if ( NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY )
     set ( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
-    set ( ZLIB_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
-endif ( )
-if ( NOT DEFINED STATICLIB_TOOLCHAIN )
-    if ( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
-        external_libjpeg-turbo_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../external_zlib )
-    endif ( )
 endif ( )
 
 # library
@@ -40,6 +33,6 @@ add_custom_target ( ${PROJECT_NAME} DEPENDS libjpeg-turbo )
 set ( ${PROJECT_NAME}_MODULE libjpeg-turbo )
 set ( ${PROJECT_NAME}_PC_CFLAGS                              "-I${CMAKE_CURRENT_LIST_DIR}/libjpeg-turbo" )
 set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -I${CMAKE_CURRENT_LIST_DIR}/resources/libjpeg-turbo_1290_cmake/include" )
-set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -ljpeg-turbo" )
+set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -llibjpeg-turbo" )
 configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/pkg-config.in 
         ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/libjpeg-turbo.pc )

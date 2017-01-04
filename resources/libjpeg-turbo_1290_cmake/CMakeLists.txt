@@ -14,34 +14,97 @@
 
 # this file is based on https://github.com/ojdkbuild/lookaside_libjpeg-turbo/blob/95ce05fc3a001d82bca428faa69ad219bc017f72/CMakeLists.txt
 cmake_minimum_required ( VERSION 2.8.12 )
-project ( lookaside_libjpeg-turbo C )
+project ( libjpeg-turbo C )
 set ( ${PROJECT_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../libjpeg-turbo )
+
+# standalone build
+if ( NOT DEFINED STATICLIB_TOOLCHAIN )
+    if ( NOT DEFINED ${PROJECT_NAME}_TOOLCHAIN )
+        if ( WIN32 )
+            if ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+                set ( ${PROJECT_NAME}_TOOLCHAIN "windows_amd64_msvc" )
+            else ( )
+                set ( ${PROJECT_NAME}_TOOLCHAIN "windows_i386_msvc" )
+            endif ( )
+        elseif ( UNIX )
+            set ( ${PROJECT_NAME}_TOOLCHAIN "linux_amd64_gcc" )
+        else ( )
+            message ( FATAL_ERROR "Cannot determine toolchain to use, please specify [${PROJECT_NAME}_TOOLCHAIN]" )
+        endif ( )
+    endif ( )
+else ( )
+    set ( ${PROJECT_NAME}_TOOLCHAIN ${STATICLIB_TOOLCHAIN} )
+endif ( )
 
 # simd
 set ( NASM nasm )
-set ( NAFLAGS 
-        -fwin64
-        -DWIN64
-        -D__x86_64__
-        -I${${PROJECT_NAME}_SOURCE_DIR}/win/
-        -I${${PROJECT_NAME}_SOURCE_DIR}/ )
+if ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_i386_[^_]+" )
+    set ( NAFLAGS 
+            -fwin32
+            -DWIN32 )
+elseif ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_amd64_[^_]+" )
+    set ( NAFLAGS 
+            -fwin64
+            -DWIN64
+            -D__x86_64__ )
+endif ( )
+list ( APPEND NAFLAGS 
+            -I${${PROJECT_NAME}_SOURCE_DIR}/win/
+            -I${${PROJECT_NAME}_SOURCE_DIR}/ )
 
-set ( SIMD_BASENAMES 
-    jfsseflt-64
-    jccolss2-64
-    jdcolss2-64
-    jcgrass2-64
-    jcsamss2-64
-    jdsamss2-64
-    jdmerss2-64
-    jcqnts2i-64
-    jfss2fst-64
-    jfss2int-64
-    jiss2red-64
-    jiss2int-64
-    jiss2fst-64
-    jcqnts2f-64
-    jiss2flt-64 )
+if ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_i386_[^_]+" )
+    set ( SIMD_BASENAMES 
+            jsimdcpu
+            jccolmmx
+            jcgrammx
+            jdcolmmx
+            jcsammmx
+            jdsammmx
+            jdmermmx
+            jcqntmmx
+            jfmmxfst
+            jfmmxint
+            jimmxred
+            jimmxint
+            jimmxfst
+            jcqnt3dn
+            jf3dnflt
+            ji3dnflt
+            jcqntsse
+            jfsseflt
+            jisseflt
+            jccolss2
+            jcgrass2
+            jdcolss2
+            jcsamss2
+            jdsamss2
+            jdmerss2
+            jcqnts2i
+            jfss2fst
+            jfss2int
+            jiss2red
+            jiss2int
+            jiss2fst
+            jcqnts2f
+            jiss2flt )
+elseif ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_amd64_[^_]+" )
+    set ( SIMD_BASENAMES 
+            jfsseflt-64
+            jccolss2-64
+            jdcolss2-64
+            jcgrass2-64
+            jcsamss2-64
+            jdsamss2-64
+            jdmerss2-64
+            jcqnts2i-64
+            jfss2fst-64
+            jfss2int-64
+            jiss2red-64
+            jiss2int-64
+            jiss2fst-64
+            jcqnts2f-64
+            jiss2flt-64 )
+endif ( )
 
 set ( OBJDIR ${CMAKE_CURRENT_BINARY_DIR} )
 file ( GLOB INC_FILES ${${PROJECT_NAME}_SOURCE_DIR}/simd *.inc )
@@ -125,8 +188,15 @@ set ( ${PROJECT_NAME}_SRC
         ${${PROJECT_NAME}_SOURCE_DIR}/jmemnobs.c 
         ${${PROJECT_NAME}_SOURCE_DIR}/jaricom.c
         ${${PROJECT_NAME}_SOURCE_DIR}/jcarith.c
-        ${${PROJECT_NAME}_SOURCE_DIR}/jdarith.c
-        ${${PROJECT_NAME}_SOURCE_DIR}/simd/jsimd_x86_64.c )
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdarith.c )
+
+if ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_i386_[^_]+" )
+    list ( APPEND ${PROJECT_NAME}_SRC
+            ${${PROJECT_NAME}_SOURCE_DIR}/simd/jsimd_i386.c )
+elseif ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_amd64_[^_]+" )
+    list ( APPEND ${PROJECT_NAME}_SRC
+            ${${PROJECT_NAME}_SOURCE_DIR}/simd/jsimd_x86_64.c )
+endif ( )
 
 add_library ( ${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SRC} ${SIMD_OBJS} )
 target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE 
