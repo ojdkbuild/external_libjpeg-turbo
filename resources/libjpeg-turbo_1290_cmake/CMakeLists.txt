@@ -1,0 +1,137 @@
+# Copyright 2016, alex at staticlibs.net
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# this file is based on https://github.com/ojdkbuild/lookaside_libjpeg-turbo/blob/95ce05fc3a001d82bca428faa69ad219bc017f72/CMakeLists.txt
+cmake_minimum_required ( VERSION 2.8.12 )
+project ( lookaside_libjpeg-turbo C )
+set ( ${PROJECT_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../libjpeg-turbo )
+
+# simd
+set ( NASM nasm )
+set ( NAFLAGS 
+        -fwin64
+        -DWIN64
+        -D__x86_64__
+        -I${${PROJECT_NAME}_SOURCE_DIR}/win/
+        -I${${PROJECT_NAME}_SOURCE_DIR}/ )
+
+set ( SIMD_BASENAMES 
+    jfsseflt-64
+    jccolss2-64
+    jdcolss2-64
+    jcgrass2-64
+    jcsamss2-64
+    jdsamss2-64
+    jdmerss2-64
+    jcqnts2i-64
+    jfss2fst-64
+    jfss2int-64
+    jiss2red-64
+    jiss2int-64
+    jiss2fst-64
+    jcqnts2f-64
+    jiss2flt-64 )
+
+set ( OBJDIR ${CMAKE_CURRENT_BINARY_DIR} )
+file ( GLOB INC_FILES ${${PROJECT_NAME}_SOURCE_DIR}/simd *.inc )
+
+foreach ( file ${SIMD_BASENAMES} )
+  set ( DEPFILE "" )
+  set ( SIMD_SRC ${${PROJECT_NAME}_SOURCE_DIR}/simd/${file}.asm )
+  if ( ${file} MATCHES col )
+    set ( DEPFILE ${file} )
+    string ( REGEX REPLACE "col" "clr" DEPFILE ${DEPFILE} )
+    set ( DEPFILE ${${PROJECT_NAME}_SOURCE_DIR}/simd/${DEPFILE}.asm )
+  endif ( )
+  if ( ${file} MATCHES mer )
+    set ( DEPFILE ${file} )
+    string ( REGEX REPLACE "mer" "mrg" DEPFILE ${DEPFILE} )
+    set ( DEPFILE ${${PROJECT_NAME}_SOURCE_DIR}/simd/${DEPFILE}.asm )
+  endif ( )
+  if ( ${file} MATCHES gra )
+    set ( DEPFILE ${file} )
+    string ( REGEX REPLACE "gra" "gry" DEPFILE ${DEPFILE} )
+    set ( DEPFILE ${${PROJECT_NAME}_SOURCE_DIR}/simd/${DEPFILE}.asm )
+  endif ( )
+  set ( SIMD_OBJ ${OBJDIR}/${file}.obj )
+  add_custom_command ( OUTPUT ${SIMD_OBJ}
+    DEPENDS ${SIMD_SRC} ${DEPFILE} ${INC_FILES}
+    COMMAND ${NASM} ${NAFLAGS} ${SIMD_SRC} -o${SIMD_OBJ}
+    WORKING_DIRECTORY ${${PROJECT_NAME}_SOURCE_DIR}/simd )
+  set ( SIMD_OBJS ${SIMD_OBJS} ${SIMD_OBJ} )
+endforeach ( )
+
+set_source_files_properties ( ${SIMD_OBJS} PROPERTIES GENERATED 1 )
+add_custom_target ( simd DEPENDS ${SIMD_OBJS} )
+
+# library
+set ( ${PROJECT_NAME}_SRC
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcapimin.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcapistd.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jccoefct.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jccolor.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcdctmgr.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jchuff.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcinit.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcmainct.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcmarker.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcmaster.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcomapi.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcparam.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcphuff.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcprepct.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcsample.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jctrans.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdapimin.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdapistd.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdatadst.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdatasrc.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdcoefct.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdcolor.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jddctmgr.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdhuff.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdinput.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdmainct.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdmarker.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdmaster.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdmerge.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdphuff.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdpostct.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdsample.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdtrans.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jerror.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jfdctflt.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jfdctfst.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jfdctint.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jidctflt.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jidctfst.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jidctint.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jidctred.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jquant1.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jquant2.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jutils.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jmemmgr.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jmemnobs.c 
+        ${${PROJECT_NAME}_SOURCE_DIR}/jaricom.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jcarith.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/jdarith.c
+        ${${PROJECT_NAME}_SOURCE_DIR}/simd/jsimd_x86_64.c )
+
+add_library ( ${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SRC} ${SIMD_OBJS} )
+target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE 
+        ${${PROJECT_NAME}_SOURCE_DIR}/win
+        ${${PROJECT_NAME}_SOURCE_DIR}
+        ${CMAKE_CURRENT_LIST_DIR}/include )
+target_compile_definitions ( ${PROJECT_NAME} PRIVATE 
+        -DWITH_SIMD )
