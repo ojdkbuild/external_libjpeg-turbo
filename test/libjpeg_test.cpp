@@ -29,6 +29,7 @@
 int main() {
     struct jpeg_decompress_struct st;
     jpeg_create_decompress(std::addressof(st));
+    jpeg_destroy_decompress(std::addressof(st));
 
     return 0;
 }

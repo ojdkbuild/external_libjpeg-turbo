@@ -26,13 +26,13 @@ if ( NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY )
 endif ( )
 
 # library
-add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/resources/libjpeg-turbo_1290_cmake ${CMAKE_CURRENT_BINARY_DIR}/libjpeg-turbo )
+add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/resources/libjpeg-turbo_cmake ${CMAKE_CURRENT_BINARY_DIR}/libjpeg-turbo )
 add_custom_target ( ${PROJECT_NAME} DEPENDS libjpeg-turbo )
 
 # pkg-config
 set ( ${PROJECT_NAME}_MODULE libjpeg-turbo )
-set ( ${PROJECT_NAME}_PC_CFLAGS                              "-I${CMAKE_CURRENT_LIST_DIR}/libjpeg-turbo" )
-set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -I${CMAKE_CURRENT_LIST_DIR}/resources/libjpeg-turbo_1290_cmake/include" )
+set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/resources/libjpeg-turbo_cmake/include_${STATICLIB_TOOLCHAIN}" )
+set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -I${libjpeg-turbo_LOOKASIDE_DIR}" )
 set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -llibjpeg-turbo" )
 configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/pkg-config.in 
         ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/libjpeg-turbo.pc )
