@@ -1,1 +1,1 @@
-https://github.com/staticlibs/lookaside_libjpeg-turbo/tree/f5442c4b0e54c72667e8180a13db9a4ebc69e9ef
+https://github.com/staticlibs/lookaside_libjpeg-turbo/tree/82f41269fafc15c11caec8c806c3d7faa89c0c44

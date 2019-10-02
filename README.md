@@ -41,14 +41,19 @@ This project is released under the [Apache License 2.0](http://www.apache.org/li
 Changelog
 ---------
 
+**2019-10-02**
+
+ * version 1.2.90-4
+ * 4 patches applied
+
 **2019-01-07**
 
- * version 1.5.13-3
+ * version 1.2.90-3
  * lookaside sources minor update
 
 **2018-03-20**
 
- * version 1.5.13-2
+ * version 1.2.90-2
  * drop submodule
  * linux, macos and android builds
 
