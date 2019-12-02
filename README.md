@@ -41,6 +41,11 @@ This project is released under the [Apache License 2.0](http://www.apache.org/li
 Changelog
 ---------
 
+**2019-12-02**
+
+ * version 1.2.90-5
+ * support overriding C runtime lib on Windows
+
 **2019-10-02**
 
  * version 1.2.90-4

@@ -219,3 +219,10 @@ add_library ( ${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SRC} )
 target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE ${${PROJECT_NAME}_INCLUDE} )
 target_compile_definitions ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEFINITIONS} )
 target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_OPTIONS} )
+
+if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
+    if ( DEFINED ${PROJECT_NAME}_MSVC_ALT_CRUNTIME )
+        target_compile_options ( ${PROJECT_NAME} PRIVATE
+                ${${PROJECT_NAME}_MSVC_ALT_CRUNTIME} )
+    endif ( )
+endif ( )
