@@ -41,6 +41,11 @@ This project is released under the [Apache License 2.0](http://www.apache.org/li
 Changelog
 ---------
 
+**2020-10-02**
+
+ * version 1.2.90-6
+ * pkgconfig name compat
+
 **2019-12-02**
 
  * version 1.2.90-5

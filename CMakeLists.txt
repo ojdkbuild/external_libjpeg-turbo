@@ -16,7 +16,7 @@ cmake_minimum_required ( VERSION 2.8.12 )
 
 # project
 project ( external_libjpeg-turbo CXX C )
-set ( ${PROJECT_NAME}_STATICLIB_VERSION 1.2.90-5 )
+set ( ${PROJECT_NAME}_STATICLIB_VERSION 1.2.90-6 )
 set ( ${PROJECT_NAME}_DESCRIPTION "libjpeg-turbo library build for Staticlibs" )
 set ( ${PROJECT_NAME}_URL https://github.com/staticlibs/external_libjpeg-turbo )
 
@@ -36,3 +36,5 @@ set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -I${libjpeg-turbo_
 set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -llibjpeg-turbo" )
 configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/pkg-config.in 
         ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/libjpeg-turbo.pc )
+configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/pkg-config.in 
+        ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/libjpeg.pc )
